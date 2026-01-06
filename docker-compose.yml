@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: feedflow-postgres
+    environment:
+      POSTGRES_USER: feedflow
+      POSTGRES_PASSWORD: feedflow
+      POSTGRES_DB: feedflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - feedflow-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U feedflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: feedflow-app
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://feedflow:feedflow@postgres:5432/feedflow?schema=public
+      NEXTAUTH_SECRET: your-secret-key-change-this-in-production
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - feedflow-network
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+
+networks:
+  feedflow-network:
+    driver: bridge

@@ -1,0 +1,185 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "confirm": "确认",
+    "back": "返回",
+    "search": "搜索",
+    "add": "添加",
+    "submit": "提交"
+  },
+  "nav": {
+    "title": "FeedFlow",
+    "home": "首页",
+    "settings": "个人设置",
+    "profile": "个人设置",
+    "admin": "管理员面板",
+    "logout": "退出登录"
+  },
+  "auth": {
+    "signIn": {
+      "title": "登录",
+      "email": "邮箱",
+      "password": "密码",
+      "button": "登录",
+      "noAccount": "还没有账户？",
+      "signUp": "注册",
+      "invalidCredentials": "邮箱或密码错误",
+      "unknownError": "发生错误，请重试"
+    },
+    "signUp": {
+      "title": "注册",
+      "email": "邮箱",
+      "password": "密码",
+      "name": "用户名",
+      "button": "注册",
+      "hasAccount": "已有账户？",
+      "signIn": "登录",
+      "disabled": "用户注册已禁用，请联系管理员",
+      "disabledMessage": "新用户注册功能已关闭",
+      "registrationFailed": "注册失败，请重试",
+      "unknownError": "发生错误，请重试"
+    }
+  },
+  "home": {
+    "addFeed": {
+      "title": "添加订阅",
+      "placeholder": "RSS URL (例如：https://example.com/feed.xml)",
+      "button": "添加",
+      "adding": "添加中...",
+      "examples": "试试这些示例 RSS 源",
+      "error": {
+        "required": "请输入 RSS URL",
+        "invalidUrl": "URL 必须以 http:// 或 https:// 开头",
+        "networkError": "添加失败：网络错误，请稍后重试"
+      }
+    },
+    "feeds": {
+      "title": "您的订阅",
+      "allFeeds": "全部订阅",
+      "refresh": "刷新",
+      "refreshing": "刷新中...",
+      "unsubscribe": "取消订阅",
+      "itemsCount": "篇文章"
+    },
+    "tags": {
+      "title": "标签过滤",
+      "all": "全部"
+    },
+    "items": {
+      "title": "全部文章",
+      "noItems": "没有找到文章。添加一个订阅源开始吧。",
+      "read": "已读",
+      "unread": "未读",
+      "markAsRead": "标记为已读",
+      "publishedAt": "发布于"
+    },
+    "filter": {
+      "all": "全部",
+      "read": "已读",
+      "unread": "未读"
+    }
+  },
+  "settings": {
+    "title": "个人设置",
+    "description": "管理您的订阅源和个人偏好",
+    "language": {
+      "title": "语言设置",
+      "label": "界面语言",
+      "zh": "中文",
+      "en": "English",
+      "save": "保存语言设置"
+    },
+    "theme": {
+      "title": "主题设置",
+      "label": "界面主题",
+      "light": "浅色模式",
+      "dark": "深色模式",
+      "system": "跟随系统"
+    },
+    "feeds": {
+      "title": "订阅源管理",
+      "description": "管理您的所有 RSS 订阅源和标签设置",
+      "batchAddTags": "批量添加标签",
+      "selectAll": "全选",
+      "cancelSelectAll": "取消全选",
+      "searchPlaceholder": "搜索订阅源...",
+      "noFeeds": "暂无订阅源",
+      "goToAdd": "前往添加",
+      "total": "共 {count} 个订阅源",
+      "itemsCount": "{count} 篇文章",
+      "createdAt": "添加于",
+      "noTags": "无标签",
+      "addTags": "添加标签",
+      "tagsPlaceholder": "添加标签（用逗号分隔）...",
+      "applyTo": "应用到 {count} 个订阅源",
+      "batchTagsPlaceholder": "输入标签，用逗号分隔（如：技术,新闻）",
+      "selected": "已选择 {count} 个订阅源",
+      "allTags": "所有标签",
+      "deleteFeed": "删除订阅源",
+      "deleteConfirm": "确定要删除这个订阅源吗？",
+      "refresh": "刷新",
+      "delete": "删除",
+      "addTag": "+",
+      "removeTag": "{tag} ×",
+      "clickToRemoveTag": "点击删除标签",
+      "batchTags": "批量设置标签",
+      "enterTags": "输入标签"
+    },
+    "actions": {
+      "save": "保存中...",
+      "saved": "已保存"
+    }
+  },
+  "profile": {
+    "title": "个人设置",
+    "language": "语言",
+    "theme": "主题",
+    "manageFeeds": "订阅管理",
+    "back": "返回",
+    "actions": {
+      "save": "保存",
+      "cancel": "取消"
+    }
+  },
+  "menu": {
+    "profile": "个人设置",
+    "settings": "订阅设置",
+    "admin": "管理员面板",
+    "logout": "退出登录"
+  },
+  "admin": {
+    "title": "FeedFlow",
+    "subtitle": "管理员面板",
+    "backToHome": "返回首页",
+    "logout": "退出",
+    "systemConfig": "系统配置",
+    "systemConfigDesc": "管理平台功能和设置",
+    "loading": "加载中..."
+  },
+  "reader": {
+    "settings": "阅读设置",
+    "errorNotFound": "未找到该文章",
+    "errorLoading": "加载文章失败",
+    "fontSize": "字体大小",
+    "lineHeight": "行间距",
+    "fontFamily": "字体选择",
+    "colorScheme": "配色方案",
+    "backgroundColor": "背景颜色",
+    "textColor": "文本颜色",
+    "customColors": "自定义颜色",
+    "reset": "重置默认",
+    "save": "保存设置",
+    "saving": "保存中...",
+    "saved": "已保存"
+  },
+  "errors": {
+    "required": "此字段为必填项",
+    "invalidUrl": "请输入有效的 URL",
+    "network": "网络错误，请稍后重试",
+    "unknown": "未知错误"
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "back": "Back",
+    "search": "Search",
+    "add": "Add",
+    "submit": "Submit"
+  },
+  "nav": {
+    "title": "FeedFlow",
+    "home": "Home",
+    "settings": "Settings",
+    "profile": "Profile",
+    "admin": "Admin Panel",
+    "logout": "Sign Out"
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign In",
+      "email": "Email",
+      "password": "Password",
+      "button": "Sign In",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign Up",
+      "invalidCredentials": "Invalid email or password",
+      "unknownError": "Something went wrong. Please try again."
+    },
+    "signUp": {
+      "title": "Sign Up",
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "button": "Sign Up",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign In",
+      "disabled": "User registration is disabled. Please contact administrator.",
+      "disabledMessage": "Registration is currently disabled for new accounts.",
+      "registrationFailed": "Registration failed. Please try again.",
+      "unknownError": "Something went wrong. Please try again."
+    }
+  },
+  "home": {
+    "addFeed": {
+      "title": "Add Feed",
+      "placeholder": "RSS URL (e.g., https://example.com/feed.xml)",
+      "button": "Add Feed",
+      "adding": "Adding...",
+      "examples": "Try these example RSS feeds",
+      "error": {
+        "required": "Please enter RSS URL",
+        "invalidUrl": "URL must start with http:// or https://",
+        "networkError": "Failed to add: Network error, please try again later"
+      }
+    },
+    "feeds": {
+      "title": "Your Feeds",
+      "allFeeds": "All Feeds",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing...",
+      "unsubscribe": "Unsubscribe",
+      "itemsCount": "{count} items"
+    },
+    "tags": {
+      "title": "Filter by Tags",
+      "all": "All"
+    },
+    "items": {
+      "title": "All Items",
+      "noItems": "No items found. Add a feed to get started.",
+      "read": "Read",
+      "unread": "Unread",
+      "markAsRead": "Mark as Read",
+      "publishedAt": "Published on"
+    },
+    "filter": {
+      "all": "All",
+      "read": "Read",
+      "unread": "Unread"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your feeds and preferences",
+    "language": {
+      "title": "Language Settings",
+      "label": "Interface Language",
+      "zh": "中文",
+      "en": "English",
+      "save": "Save Language Settings"
+    },
+    "theme": {
+      "title": "Theme Settings",
+      "label": "Interface Theme",
+      "light": "Light Mode",
+      "dark": "Dark Mode",
+      "system": "System Default"
+    },
+    "feeds": {
+      "title": "Feed Management",
+      "description": "Manage all your RSS feeds and tag settings",
+      "batchAddTags": "Batch Add Tags",
+      "selectAll": "Select All",
+      "cancelSelectAll": "Deselect All",
+      "searchPlaceholder": "Search feeds...",
+      "noFeeds": "No feeds found",
+      "goToAdd": "Go to Add",
+      "total": "Total {count} feeds",
+      "itemsCount": "{count} items",
+      "createdAt": "Added on",
+      "noTags": "No tags",
+      "addTags": "Add Tags",
+      "tagsPlaceholder": "Add tags (comma separated)...",
+      "applyTo": "Apply to {count} feeds",
+      "batchTagsPlaceholder": "Enter tags, separated by commas (e.g., tech,news)",
+      "selected": "{count} feeds selected",
+      "allTags": "All Tags",
+      "deleteFeed": "Delete Feed",
+      "deleteConfirm": "Are you sure you want to delete this feed?",
+      "refresh": "Refresh",
+      "delete": "Delete",
+      "addTag": "+",
+      "removeTag": "{tag} ×",
+      "clickToRemoveTag": "Click to remove tag",
+      "batchTags": "Batch Set Tags",
+      "enterTags": "Enter tags"
+    },
+    "actions": {
+      "save": "Saving...",
+      "saved": "Saved"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "language": "Language",
+    "theme": "Theme",
+    "manageFeeds": "Manage Feeds",
+    "back": "Back",
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
+  "menu": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "admin": "Admin Panel",
+    "logout": "Sign Out"
+  },
+  "admin": {
+    "title": "FeedFlow",
+    "subtitle": "Admin Panel",
+    "backToHome": "Back to Home",
+    "logout": "Sign Out",
+    "systemConfig": "System Configuration",
+    "systemConfigDesc": "Manage platform features and settings",
+    "loading": "Loading..."
+  },
+  "reader": {
+    "settings": "Reading Settings",
+    "errorNotFound": "Article not found",
+    "errorLoading": "Failed to load article",
+    "fontSize": "Font Size",
+    "lineHeight": "Line Height",
+    "fontFamily": "Font Family",
+    "colorScheme": "Color Scheme",
+    "backgroundColor": "Background Color",
+    "textColor": "Text Color",
+    "customColors": "Custom Colors",
+    "reset": "Reset to Default",
+    "save": "Save Settings",
+    "saving": "Saving...",
+    "saved": "Saved"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidUrl": "Please enter a valid URL",
+    "network": "Network error, please try again later",
+    "unknown": "Unknown error"
+  }
+}

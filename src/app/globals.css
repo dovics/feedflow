@@ -1,26 +1,48 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  html {
+    @apply antialiased;
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-50;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-gray-200 dark:border-gray-700;
+  }
+
+  body {
+    @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-50;
+  }
+}
+
+/* Improved text contrast for light mode */
+@layer utilities {
+  .text-contrast {
+    @apply text-gray-900 dark:text-gray-100;
+  }
+
+  .text-contrast-secondary {
+    @apply text-gray-700 dark:text-gray-300;
+  }
+
+  .text-contrast-muted {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+
+  .bg-contrast-card {
+    @apply bg-white dark:bg-gray-900;
+  }
+
+  .bg-contrast-subtle {
+    @apply bg-gray-50 dark:bg-gray-800;
+  }
+
+  .border-contrast {
+    @apply border-gray-300 dark:border-gray-600;
+  }
 }
