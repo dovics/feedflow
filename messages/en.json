@@ -72,6 +72,7 @@
     "items": {
       "title": "All Items",
       "noItems": "No items found. Add a feed to get started.",
+      "noMoreItems": "No more items",
       "read": "Read",
       "unread": "Unread",
       "markAsRead": "Mark as Read",
@@ -127,7 +128,27 @@
       "removeTag": "{tag} ×",
       "clickToRemoveTag": "Click to remove tag",
       "batchTags": "Batch Set Tags",
-      "enterTags": "Enter tags"
+      "enterTags": "Enter tags",
+      "addFeed": {
+        "title": "Add New Feed",
+        "button": "Add Feed",
+        "urlLabel": "RSS Feed URL",
+        "urlPlaceholder": "https://example.com/feed.xml",
+        "tagsLabel": "Tags",
+        "tagsPlaceholder": "tech,news (comma separated)",
+        "defaultStatusLabel": "Default Read Status",
+        "statusRead": "Read",
+        "statusUnread": "Unread",
+        "titleFilterLabel": "Title Filter (Optional)",
+        "titleFilterPlaceholder": "Leave empty to disable filtering",
+        "titleFilterHelp": "Titles matching this regex will not be added to the feed",
+        "submit": "Add Feed",
+        "adding": "Adding...",
+        "error": {
+          "required": "Please enter RSS feed URL",
+          "invalidUrl": "URL must start with http:// or https://"
+        }
+      }
     },
     "actions": {
       "save": "Saving...",

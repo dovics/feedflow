@@ -1,23 +1,4 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: feedflow-postgres
-    environment:
-      POSTGRES_USER: feedflow
-      POSTGRES_PASSWORD: feedflow
-      POSTGRES_DB: feedflow
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - feedflow-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U feedflow"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   app:
     build:
       context: .
@@ -25,20 +6,29 @@ services:
     container_name: feedflow-app
     ports:
       - "3000:3000"
+      - "5432:5432"
     environment:
-      DATABASE_URL: postgresql://feedflow:feedflow@postgres:5432/feedflow?schema=public
+      # Database configuration
+      # If DATABASE_URL is not set, embedded PostgreSQL will be started automatically
+      # DATABASE_URL: postgresql://feedflow:feedflow@localhost:5432/feedflow?schema=public
+      # Application configuration
       DEFAULT_ADMIN_PASSWORD: your-secret-key-change-this-in-production
       NODE_ENV: production
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - feedflow-network
+      # NextAuth configuration
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: change-this-to-a-random-string-in-production
+    volumes:
+      # PostgreSQL data (only needed if DATABASE_URL is not set)
+      - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
+
+# Example configuration for external PostgreSQL database
+# To use an external database, simply uncomment the DATABASE_URL line below:
+#
+#  app:
+#    environment:
+#      DATABASE_URL: postgresql://user:password@external-postgres-host:5432/feedflow?schema=public
+#      # When DATABASE_URL is set, embedded PostgreSQL will not be started
 
 volumes:
   postgres-data:
-
-networks:
-  feedflow-network:
-    driver: bridge

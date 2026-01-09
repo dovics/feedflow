@@ -5,8 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../src/generated/prisma"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -40,6 +41,7 @@ model Feed {
   title             String?  @map("title")
   tags              String[] @default(["未分类"]) @map("tags")
   defaultReadStatus Boolean  @default(false) @map("default_read_status")
+  titleFilter       String?  @map("title_filter")
   userId            String   @map("user_id")
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt         DateTime @default(now()) @map("created_at")

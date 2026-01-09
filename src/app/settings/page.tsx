@@ -12,6 +12,7 @@ interface Feed {
   url: string;
   tags: string[];
   defaultReadStatus: boolean;
+  titleFilter?: string | null;
   createdAt: string;
   _count: {
     items: number;
@@ -37,8 +38,16 @@ export default function SettingsPage() {
   const [editingFeedId, setEditingFeedId] = useState<string | null>(null);
   const [editingForm, setEditingForm] = useState({
     tags: "",
-    defaultReadStatus: false
+    defaultReadStatus: false,
+    titleFilter: ""
   });
+  const [showAddFeed, setShowAddFeed] = useState(false);
+  const [newFeedUrl, setNewFeedUrl] = useState("");
+  const [newFeedTitleFilter, setNewFeedTitleFilter] = useState("");
+  const [newFeedDefaultReadStatus, setNewFeedDefaultReadStatus] = useState(false);
+  const [newFeedTags, setNewFeedTags] = useState("");
+  const [addingFeed, setAddingFeed] = useState(false);
+  const [addFeedError, setAddFeedError] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -90,13 +99,18 @@ export default function SettingsPage() {
     }
   };
 
-  const updateFeed = async (feedId: string, tags: string[], defaultReadStatus: boolean) => {
+  const updateFeed = async (feedId: string, tags: string[], defaultReadStatus: boolean, titleFilter?: string) => {
     try {
       setSaving(feedId);
+      const body: any = { tags, defaultReadStatus };
+      if (titleFilter !== undefined) {
+        body.titleFilter = titleFilter || null;
+      }
+
       const res = await fetch(`/api/feeds/${feedId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tags, defaultReadStatus })
+        body: JSON.stringify(body)
       });
 
       if (!res.ok) {
@@ -107,7 +121,7 @@ export default function SettingsPage() {
 
       await fetchFeeds();
       setEditingFeedId(null);
-      setEditingForm({ tags: "", defaultReadStatus: false });
+      setEditingForm({ tags: "", defaultReadStatus: false, titleFilter: "" });
       setError("");
     } catch (error) {
       setError(t('errors.network'));
@@ -233,13 +247,14 @@ export default function SettingsPage() {
     setEditingFeedId(feed.id);
     setEditingForm({
       tags: feed.tags.join(", "),
-      defaultReadStatus: feed.defaultReadStatus
+      defaultReadStatus: feed.defaultReadStatus,
+      titleFilter: feed.titleFilter || ""
     });
   };
 
   const cancelEdit = () => {
     setEditingFeedId(null);
-    setEditingForm({ tags: "", defaultReadStatus: false });
+    setEditingForm({ tags: "", defaultReadStatus: false, titleFilter: "" });
   };
 
   const autoCategorizeFeed = async (feedId: string) => {
@@ -283,7 +298,7 @@ export default function SettingsPage() {
       .map(t => t.trim())
       .filter(t => t.length > 0);
 
-    updateFeed(editingFeedId, tagArray, editingForm.defaultReadStatus);
+    updateFeed(editingFeedId, tagArray, editingForm.defaultReadStatus, editingForm.titleFilter);
   };
 
   const toggleBatchEdit = () => {
@@ -366,6 +381,79 @@ export default function SettingsPage() {
     return Array.from(allTags).sort();
   };
 
+  const addFeed = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddingFeed(true);
+    setAddFeedError("");
+
+    if (!newFeedUrl.trim()) {
+      setAddFeedError(tSettings('feeds.addFeed.error.required'));
+      setAddingFeed(false);
+      return;
+    }
+
+    if (!newFeedUrl.startsWith('http://') && !newFeedUrl.startsWith('https://')) {
+      setAddFeedError(tSettings('feeds.addFeed.error.invalidUrl'));
+      setAddingFeed(false);
+      return;
+    }
+
+    try {
+      const tagArray = newFeedTags
+        .split(/[,，]/)
+        .map(t => t.trim())
+        .filter(t => t.length > 0);
+
+      const res = await fetch("/api/feeds", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: newFeedUrl,
+          titleFilter: newFeedTitleFilter || undefined,
+          defaultReadStatus: newFeedDefaultReadStatus,
+          tags: tagArray.length > 0 ? tagArray : undefined
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setAddFeedError(data.error || t('errors.unknown'));
+        return;
+      }
+
+      // 清空表单
+      setNewFeedUrl("");
+      setNewFeedTitleFilter("");
+      setNewFeedDefaultReadStatus(false);
+      setNewFeedTags("");
+      setShowAddFeed(false);
+      await fetchFeeds();
+    } catch (error) {
+      setAddFeedError(t('errors.network'));
+    } finally {
+      setAddingFeed(false);
+    }
+  };
+
+  const openAddFeed = () => {
+    setShowAddFeed(true);
+    setAddFeedError("");
+    setNewFeedUrl("");
+    setNewFeedTitleFilter("");
+    setNewFeedDefaultReadStatus(false);
+    setNewFeedTags("");
+  };
+
+  const closeAddFeed = () => {
+    setShowAddFeed(false);
+    setAddFeedError("");
+    setNewFeedUrl("");
+    setNewFeedTitleFilter("");
+    setNewFeedDefaultReadStatus(false);
+    setNewFeedTags("");
+  };
+
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -431,6 +519,12 @@ export default function SettingsPage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <button
+                onClick={openAddFeed}
+                className="px-4 py-2 bg-accent hover:bg-opacity-80 text-white rounded-md text-sm font-medium transition-colors"
+              >
+                {tSettings('feeds.addFeed.button')}
+              </button>
               {!batchEditMode ? (
                 <button
                   onClick={toggleBatchEdit}
@@ -456,6 +550,110 @@ export default function SettingsPage() {
               )}
             </div>
           </div>
+
+          {showAddFeed && (
+            <div className="mt-6 p-6 bg-accent/10 dark:bg-accent/20 border border-accent dark:border-accent/50 rounded-md">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-accent">
+                  {tSettings('feeds.addFeed.title')}
+                </h3>
+                <button
+                  onClick={closeAddFeed}
+                  className="text-theme-secondary hover:text-theme-primary transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {addFeedError && (
+                <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                  <p className="text-sm text-red-800 dark:text-red-300">{addFeedError}</p>
+                </div>
+              )}
+
+              <form onSubmit={addFeed} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-theme-primary mb-2">
+                    {tSettings('feeds.addFeed.urlLabel')}
+                  </label>
+                  <input
+                    type="url"
+                    value={newFeedUrl}
+                    onChange={(e) => setNewFeedUrl(e.target.value)}
+                    placeholder={tSettings('feeds.addFeed.urlPlaceholder')}
+                    className="w-full px-4 py-2 border border-theme rounded-md focus-ring bg-theme-input text-theme-text placeholder-theme-text-secondary"
+                    disabled={addingFeed}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-theme-primary mb-2">
+                      {tSettings('feeds.addFeed.tagsLabel')}
+                    </label>
+                    <input
+                      type="text"
+                      value={newFeedTags}
+                      onChange={(e) => setNewFeedTags(e.target.value)}
+                      placeholder={tSettings('feeds.addFeed.tagsPlaceholder')}
+                      className="w-full px-4 py-2 border border-theme rounded-md focus-ring bg-theme-input text-theme-text placeholder-theme-text-secondary"
+                      disabled={addingFeed}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-theme-primary mb-2">
+                      {tSettings('feeds.addFeed.defaultStatusLabel')}
+                    </label>
+                    <select
+                      value={newFeedDefaultReadStatus ? "read" : "unread"}
+                      onChange={(e) => setNewFeedDefaultReadStatus(e.target.value === "read")}
+                      className="w-full px-4 py-2 border border-theme rounded-md focus-ring bg-theme-input text-theme-text"
+                      disabled={addingFeed}
+                    >
+                      <option value="unread">{tSettings('feeds.addFeed.statusUnread')}</option>
+                      <option value="read">{tSettings('feeds.addFeed.statusRead')}</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-theme-primary mb-2">
+                    {tSettings('feeds.addFeed.titleFilterLabel')}
+                  </label>
+                  <input
+                    type="text"
+                    value={newFeedTitleFilter}
+                    onChange={(e) => setNewFeedTitleFilter(e.target.value)}
+                    placeholder={tSettings('feeds.addFeed.titleFilterPlaceholder')}
+                    className="w-full px-4 py-2 border border-theme rounded-md focus-ring bg-theme-input text-theme-text placeholder-theme-text-secondary"
+                    disabled={addingFeed}
+                  />
+                  <p className="mt-1 text-xs text-theme-secondary">
+                    {tSettings('feeds.addFeed.titleFilterHelp')}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="submit"
+                    disabled={addingFeed}
+                    className="px-6 py-2 bg-accent hover:bg-opacity-80 text-white rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {addingFeed ? tSettings('feeds.addFeed.adding') : tSettings('feeds.addFeed.submit')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeAddFeed}
+                    disabled={addingFeed}
+                    className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {t('common.cancel')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
 
           {batchEditMode && (
             <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
@@ -587,6 +785,24 @@ export default function SettingsPage() {
                                     </button>
                                   </div>
                                 </div>
+                                <div>
+                                  <label className="block text-sm font-medium text-theme-primary mb-2">
+                                    标题过滤器（正则表达式）
+                                  </label>
+                                  <input
+                                    type="text"
+                                    placeholder="留空表示不过滤，匹配的标题将被过滤掉"
+                                    value={editingForm.titleFilter}
+                                    onChange={(e) => setEditingForm({
+                                      ...editingForm,
+                                      titleFilter: e.target.value
+                                    })}
+                                    className="w-full px-3 py-2 border border-theme rounded-md focus-ring bg-theme-input text-theme-text text-sm placeholder-theme-text-secondary"
+                                  />
+                                  <p className="mt-1 text-xs text-theme-secondary">
+                                    匹配此正则表达式的标题将不会被添加到订阅源中
+                                  </p>
+                                </div>
                               </div>
                             ) : (
                               <div className="flex items-center gap-4">
@@ -606,6 +822,11 @@ export default function SettingsPage() {
                                     <span className="text-xs text-theme-muted">{tSettings('feeds.noTags')}</span>
                                   )}
                                 </div>
+                                {feed.titleFilter && (
+                                  <span className="text-xs text-purple-600 dark:text-purple-400" title={`标题过滤器: ${feed.titleFilter}`}>
+                                    🔧 已过滤
+                                  </span>
+                                )}
                                 <span className="text-sm text-theme-secondary">
                                   默认状态: {feed.defaultReadStatus ? "已读" : "未读"}
                                 </span>

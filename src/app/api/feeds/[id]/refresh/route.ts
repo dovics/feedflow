@@ -67,6 +67,20 @@ export async function POST(
       });
 
       if (!existingItem && item.title) {
+        // 如果订阅源设置了标题过滤器，检查是否应该跳过此项目
+        if (feed.titleFilter) {
+          try {
+            const regex = new RegExp(feed.titleFilter, 'i');
+            if (regex.test(item.title)) {
+              // 标题匹配过滤器，跳过此项目
+              continue;
+            }
+          } catch (error) {
+            console.error("Invalid regex filter:", error);
+            // 如果正则表达式无效，继续添加项目
+          }
+        }
+
         await prisma.item.create({
           data: {
             title: item.title,

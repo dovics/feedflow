@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN', 'SUPER_ADMIN');
+
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
@@ -9,7 +12,7 @@ CREATE TABLE "user" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "user_pkey" PRIMARY KEY ("user"."id")
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -18,12 +21,13 @@ CREATE TABLE "feed" (
     "url" TEXT NOT NULL,
     "title" TEXT,
     "tags" TEXT[] NOT NULL DEFAULT ARRAY['未分类'::TEXT],
+    "title_filter" TEXT,
     "default_read_status" BOOLEAN NOT NULL DEFAULT false,
     "user_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "feed_pkey" PRIMARY KEY ("feed"."id")
+    CONSTRAINT "feed_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -38,7 +42,7 @@ CREATE TABLE "item" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "item_pkey" PRIMARY KEY ("item"."id")
+    CONSTRAINT "item_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -49,7 +53,7 @@ CREATE TABLE "systemconfig" (
     "description" TEXT,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "systemconfig_pkey" PRIMARY KEY ("systemconfig"."id")
+    CONSTRAINT "systemconfig_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -66,6 +70,3 @@ ALTER TABLE "feed" ADD CONSTRAINT "feed_user_id_fkey" FOREIGN KEY ("user_id") RE
 
 -- AddForeignKey
 ALTER TABLE "item" ADD CONSTRAINT "item_feed_id_fkey" FOREIGN KEY ("feed_id") REFERENCES "feed"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN', 'SUPER_ADMIN');

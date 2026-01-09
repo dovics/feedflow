@@ -15,7 +15,8 @@ const parser = new Parser({
 });
 
 const feedSchema = z.object({
-  url: z.string().url()
+  url: z.string().url(),
+  titleFilter: z.string().optional()
 });
 
 export async function POST(req: NextRequest) {
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { url } = feedSchema.parse(body);
+    const { url, titleFilter } = feedSchema.parse(body);
 
     const existingFeed = await prisma.feed.findFirst({
       where: {
@@ -89,14 +90,27 @@ export async function POST(req: NextRequest) {
       pubDate: item.pubDate ? new Date(item.pubDate) : new Date()
     }));
 
+    // 如果设置了标题过滤器，使用正则表达式过滤
+    let filteredItems = feedItems;
+    if (titleFilter) {
+      try {
+        const regex = new RegExp(titleFilter, 'i');
+        filteredItems = feedItems.filter(item => !regex.test(item.title));
+      } catch (error) {
+        console.error("Invalid regex filter:", error);
+        // 如果正则表达式无效，不过滤任何项目
+      }
+    }
+
     const newFeed = await prisma.feed.create({
       data: {
         url,
         title: feed.title || url,
         tags: [],
+        titleFilter: titleFilter || null,
         userId: session.user.id,
         items: {
-          create: feedItems
+          create: filteredItems
         }
       },
       include: {

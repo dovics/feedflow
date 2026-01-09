@@ -72,6 +72,7 @@
     "items": {
       "title": "全部文章",
       "noItems": "没有找到文章。添加一个订阅源开始吧。",
+      "noMoreItems": "没有更多内容了",
       "read": "已读",
       "unread": "未读",
       "markAsRead": "标记为已读",
@@ -127,7 +128,27 @@
       "removeTag": "{tag} ×",
       "clickToRemoveTag": "点击删除标签",
       "batchTags": "批量设置标签",
-      "enterTags": "输入标签"
+      "enterTags": "输入标签",
+      "addFeed": {
+        "title": "添加新订阅",
+        "button": "添加订阅",
+        "urlLabel": "RSS 订阅源地址",
+        "urlPlaceholder": "https://example.com/feed.xml",
+        "tagsLabel": "标签",
+        "tagsPlaceholder": "技术,新闻（用逗号分隔）",
+        "defaultStatusLabel": "默认阅读状态",
+        "statusRead": "已读",
+        "statusUnread": "未读",
+        "titleFilterLabel": "标题过滤器（可选）",
+        "titleFilterPlaceholder": "留空表示不过滤",
+        "titleFilterHelp": "匹配此正则表达式的标题将不会被添加到订阅源中",
+        "submit": "添加订阅",
+        "adding": "添加中...",
+        "error": {
+          "required": "请输入 RSS 订阅源地址",
+          "invalidUrl": "URL 必须以 http:// 或 https:// 开头"
+        }
+      }
     },
     "actions": {
       "save": "保存中...",
