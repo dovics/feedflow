@@ -17,7 +17,7 @@ export function ReaderContent({
   pubDate,
   settings
 }: ReaderContentProps) {
-  const processedDescription = description
+  const processedDescription = (description || "")
     .replace(/<[^>]*>/g, "")
     .trim();
 
