@@ -59,6 +59,15 @@ export default function SettingsPage() {
     eligibleCount: 0,
     message: ""
   });
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{
+    imported: number;
+    failed: number;
+    skipped: number;
+    details?: any;
+  } | null>(null);
+  const [importError, setImportError] = useState("");
+  const [showImportModal, setShowImportModal] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -467,6 +476,81 @@ export default function SettingsPage() {
     setNewFeedTags("");
   };
 
+  const exportFeeds = async () => {
+    try {
+      const res = await fetch("/api/feeds/opml/export");
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || t('errors.unknown'));
+        return;
+      }
+
+      // 下载文件
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `feeds-${new Date().toISOString().split('T')[0]}.opml`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      setError("");
+    } catch (error) {
+      setError(t('errors.network'));
+    }
+  };
+
+  const importFeeds = async (file: File) => {
+    setImporting(true);
+    setImportError("");
+    setImportResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch("/api/feeds/opml/import", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setImportError(data.error || t('errors.unknown'));
+        return;
+      }
+
+      setImportResult({
+        imported: data.imported,
+        failed: data.failed,
+        skipped: data.skipped,
+        details: data.details
+      });
+
+      await fetchFeeds();
+      setShowImportModal(false);
+    } catch (error) {
+      setImportError(t('errors.network'));
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const openImportModal = () => {
+    setShowImportModal(true);
+    setImportError("");
+    setImportResult(null);
+  };
+
+  const closeImportModal = () => {
+    setShowImportModal(false);
+    setImportError("");
+    setImportResult(null);
+  };
+
   const fetchCleanupSettings = async () => {
     try {
       const res = await fetch("/api/settings/cleanup");
@@ -623,6 +707,18 @@ export default function SettingsPage() {
               >
                 {tSettings('feeds.addFeed.button')}
               </button>
+              <button
+                onClick={exportFeeds}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium transition-colors"
+              >
+                导出 OPML
+              </button>
+              <button
+                onClick={openImportModal}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors"
+              >
+                导入 OPML
+              </button>
               {!batchEditMode ? (
                 <button
                   onClick={toggleBatchEdit}
@@ -750,6 +846,123 @@ export default function SettingsPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {showImportModal && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+              <div className="bg-theme-surface rounded-lg shadow-xl max-w-lg w-full">
+                <div className="border-b border-theme px-6 py-4 flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-theme-primary">导入 OPML 文件</h2>
+                  <button
+                    onClick={closeImportModal}
+                    className="text-theme-secondary hover:text-theme-primary transition-colors"
+                  >
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="p-6 space-y-4">
+                  {importError && (
+                    <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md">
+                      <p className="text-sm text-red-900 dark:text-red-200">{importError}</p>
+                    </div>
+                  )}
+
+                  {importResult && (
+                    <div className="p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md">
+                      <h4 className="text-sm font-semibold text-green-900 dark:text-green-200 mb-2">
+                        导入完成
+                      </h4>
+                      <div className="space-y-1">
+                        <p className="text-sm text-green-900 dark:text-green-200">
+                          ✓ 成功导入: {importResult.imported} 个
+                        </p>
+                        <p className="text-sm text-green-900 dark:text-green-200">
+                          ⊘ 跳过已存在: {importResult.skipped} 个
+                        </p>
+                        {importResult.failed > 0 && (
+                          <p className="text-sm text-red-900 dark:text-red-200">
+                            ✗ 失败: {importResult.failed} 个
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {!importResult && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-theme-primary mb-2">
+                          选择文件
+                        </label>
+                        <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-theme rounded-lg hover:border-accent transition-colors">
+                          <div className="space-y-2 text-center">
+                            <svg
+                              className="mx-auto h-12 w-12 text-theme-secondary"
+                              stroke="currentColor"
+                              fill="none"
+                              viewBox="0 0 48 48"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                strokeWidth={2}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                            <div className="flex text-sm text-theme-secondary">
+                              <label
+                                htmlFor="file-upload"
+                                className="relative cursor-pointer bg-transparent rounded-md font-medium text-accent hover:text-accent/80 focus-within:outline-none"
+                              >
+                                <span>点击上传</span>
+                                <input
+                                  id="file-upload"
+                                  type="file"
+                                  accept=".opml,.xml"
+                                  className="sr-only"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      importFeeds(file);
+                                    }
+                                  }}
+                                  disabled={importing}
+                                />
+                              </label>
+                              <p className="pl-1">或拖拽文件到此处</p>
+                            </div>
+                            <p className="text-xs text-theme-secondary">
+                              支持 .opml 和 .xml 格式，最多 100 个订阅源
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {importing && (
+                        <div className="flex items-center justify-center py-4">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
+                          <span className="ml-3 text-sm text-theme-secondary">正在导入...</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                <div className="border-t border-theme px-6 py-4 flex justify-end">
+                  <button
+                    onClick={closeImportModal}
+                    disabled={importing}
+                    className="px-4 py-2 text-theme-primary bg-theme-surface hover:bg-theme-hover rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    关闭
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
