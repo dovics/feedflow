@@ -64,8 +64,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ summary: null, error: result.error });
     }
 
-    // Save to database with actual item count
-    const summary = await createDailySummary(session.user.id, result.content, language, result.itemCount || itemCount);
+    // Save to database with actual item count and article map
+    const summary = await createDailySummary(session.user.id, result.content, language, result.itemCount || itemCount, result.articleMap);
 
     logger.logApiRequestSuccess('POST', '/api/summaries/generate', userId, Date.now() - startTime, { summaryId: summary.id, itemCount: summary.itemCount });
     return NextResponse.json({ summary });

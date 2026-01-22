@@ -83,14 +83,15 @@ model SystemConfig {
 }
 
 model DailySummary {
-  id        String   @id @default(cuid()) @map("id")
-  userId    String   @map("user_id")
-  date      DateTime @map("date") @db.Date
-  content   String   @map("content") @db.Text
-  language  String   @default("zh") @map("language")
-  itemCount Int      @map("item_count")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(cuid()) @map("id")
+  userId     String   @map("user_id")
+  date       DateTime @map("date") @db.Date
+  content    String   @map("content") @db.Text
+  language   String   @default("zh") @map("language")
+  itemCount  Int      @map("item_count")
+  articleMap Json?    @map("article_map")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

@@ -9,6 +9,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 interface SummaryItem {
+  id: string;
   title: string;
   link?: string;
   description?: string;
@@ -95,6 +96,7 @@ export async function POST(req: NextRequest) {
 
         items.forEach((item) => {
           const summaryItem: SummaryItem = {
+            id: item.id,
             title: item.title,
             link: item.link || undefined,
             description: item.description ? (item.description.length > 200 ? item.description.substring(0, 200) + "..." : item.description) : undefined,
@@ -120,21 +122,36 @@ export async function POST(req: NextRequest) {
         let groupedText = "";
         const sortedTags = Object.keys(grouped).sort();
 
+        // Create a map to track article indices globally
+        const articleIndexMap = new Map<string, number>();
+        const articleLinkMap: { [key: number]: string } = {};
+        let globalIndex = 1;
+
         sortedTags.forEach((tag) => {
           groupedText += `\n## ${tag}\n`;
           grouped[tag].slice(0, 5).forEach((item, index) => {
-            groupedText += `${index + 1}. ${item.title}`;
+            articleIndexMap.set(item.id, globalIndex);
+            if (item.link) {
+              articleLinkMap[globalIndex] = item.link;
+            }
+            groupedText += `[${globalIndex}] ${item.title}`;
             if (item.description) {
               groupedText += `\n   ${item.description}`;
             }
             groupedText += "\n";
+            globalIndex++;
           });
         });
 
         if (untagged.length > 0) {
           groupedText += "\n## 其他\n";
           untagged.slice(0, 5).forEach((item, index) => {
-            groupedText += `${index + 1}. ${item.title}\n`;
+            articleIndexMap.set(item.id, globalIndex);
+            if (item.link) {
+              articleLinkMap[globalIndex] = item.link;
+            }
+            groupedText += `[${globalIndex}] ${item.title}\n`;
+            globalIndex++;
           });
         }
 
@@ -151,13 +168,15 @@ ${groupedText}
 请按以下格式生成摘要：
 
 ## 今日要点
-列出3-5个最重要的新闻或趋势
+列出3-5个最重要的新闻或趋势，在提到具体文章时使用 [编号] 格式引用文章
 
 ## 分类摘要
-按分类简要总结各领域的主要动态
+按分类简要总结各领域的主要动态，在提到具体文章时使用 [编号] 格式引用文章
 
 ## 值得关注
-推荐3-5篇特别值得阅读的文章及其理由
+推荐3-5篇特别值得阅读的文章及其理由，使用 [编号] 格式引用文章
+
+重要：在摘要中引用文章时，必须使用文章编号的方括号格式，例如 [1]、[2]、[3] 等。这样用户可以点击查看原文链接。
 
 保持简洁，每部分控制在2-3句话。使用markdown格式。`
           : `Please generate a daily summary based on the following unread articles from the last 24 hours:
@@ -167,13 +186,15 @@ ${groupedText}
 Please format the summary as follows:
 
 ## Today's Highlights
-List 3-5 most important news or trends
+List 3-5 most important news or trends, reference specific articles using [number] format
 
 ## Category Summaries
-Briefly summarize key developments in each category
+Briefly summarize key developments in each category, reference specific articles using [number] format
 
 ## Worth Reading
-Recommend 3-5 articles that are particularly worth reading with reasons
+Recommend 3-5 articles that are particularly worth reading with reasons, use [number] format to reference articles
+
+Important: When referencing articles in the summary, you must use the bracketed number format like [1], [2], [3], etc. This allows users to click and view the original article links.
 
 Keep it concise, limit each section to 2-3 sentences. Use markdown format.`;
 
@@ -223,6 +244,7 @@ Keep it concise, limit each section to 2-3 sentences. Use markdown format.`;
 
         const decoder = new TextDecoder();
         let buffer = '';
+        let streamComplete = false;
 
         while (true) {
           const { done, value } = await reader.read();
@@ -237,9 +259,8 @@ Keep it concise, limit each section to 2-3 sentences. Use markdown format.`;
             if (trimmed.startsWith('data: ')) {
               const data = trimmed.slice(6);
               if (data === '[DONE]') {
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'done' })}\n\n`));
-                controller.close();
-                return;
+                streamComplete = true;
+                break;
               }
 
               try {
@@ -253,6 +274,10 @@ Keep it concise, limit each section to 2-3 sentences. Use markdown format.`;
               }
             }
           }
+
+          if (streamComplete) {
+            break;
+          }
         }
 
         // Save to database after streaming is complete
@@ -263,7 +288,11 @@ Keep it concise, limit each section to 2-3 sentences. Use markdown format.`;
         // Note: In a real implementation, you'd want to collect all tokens
         // For now, we'll let the client handle displaying and we can save separately
 
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'done', itemCount: items.length })}\n\n`));
+        console.log("Stream done - items.length:", items.length);
+        console.log("Stream done - articleLinkMap:", articleLinkMap);
+        console.log("Stream done - JSON to send:", JSON.stringify({ type: 'done', itemCount: items.length, articleMap: articleLinkMap }));
+
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'done', itemCount: items.length, articleMap: articleLinkMap })}\n\n`));
         controller.close();
 
       } catch (error) {

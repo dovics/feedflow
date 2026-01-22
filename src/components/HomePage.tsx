@@ -19,6 +19,7 @@ interface DailySummaryData {
   content: string;
   language: string;
   itemCount: number;
+  articleMap?: { [key: number]: string } | null;
 }
 
 export function HomePage() {
@@ -212,10 +213,12 @@ export function HomePage() {
                 fullContent += parsed.data;
                 setStreamingContent(fullContent);
               } else if (parsed.type === 'done') {
+                console.log("Stream done received - parsed:", parsed);
+                console.log("Stream done received - articleMap:", parsed.articleMap);
                 const saveRes = await fetch("/api/summaries/save", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ force, content: fullContent, itemCount: parsed.itemCount })
+                  body: JSON.stringify({ force, content: fullContent, itemCount: parsed.itemCount, articleMap: parsed.articleMap })
                 });
                 const saveData = await saveRes.json();
                 if (saveData.summary) {
@@ -266,6 +269,8 @@ export function HomePage() {
         .then(res => res.json())
         .then(data => {
           if (data.summary) {
+            console.log("Summary loaded:", data.summary);
+            console.log("Article map:", data.summary.articleMap);
             setSummary(data.summary);
             setSummaryError(null);
           } else if (data.error) {

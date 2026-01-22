@@ -17,6 +17,9 @@ export async function POST(req: NextRequest) {
     const force = body.force === true;
     const content = body.content;
     const itemCount = body.itemCount || 0;
+    const articleMap = body.articleMap;
+
+    console.log("Save summary - force:", force, "articleMap:", articleMap);
 
     if (!content) {
       return NextResponse.json({ error: "Content is required" }, { status: 400 });
@@ -31,6 +34,7 @@ export async function POST(req: NextRequest) {
     let summary;
 
     if (existingSummary && force) {
+      console.log("Updating existing summary with articleMap:", articleMap);
       // Update existing summary
       summary = await prisma.dailySummary.update({
         where: {
@@ -41,14 +45,17 @@ export async function POST(req: NextRequest) {
         },
         data: {
           content: content,
-          language: language
+          language: language,
+          ...(articleMap ? { articleMap } : {})
         }
       });
     } else {
+      console.log("Creating new summary with articleMap:", articleMap);
       // Create new summary
-      summary = await createDailySummary(session.user.id, content, language, itemCount);
+      summary = await createDailySummary(session.user.id, content, language, itemCount, articleMap);
     }
 
+    console.log("Saved summary:", summary);
     return NextResponse.json({ summary });
   } catch (error) {
     console.error("Failed to save summary:", error);
