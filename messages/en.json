@@ -12,7 +12,7 @@
     "submit": "Submit"
   },
   "nav": {
-    "title": "FeedFlow",
+    "title": "FeedWise",
     "home": "Home",
     "settings": "Settings",
     "profile": "Profile",
@@ -177,7 +177,7 @@
     "logout": "Sign Out"
   },
   "admin": {
-    "title": "FeedFlow",
+    "title": "FeedWise",
     "subtitle": "Admin Panel",
     "backToHome": "Back to Home",
     "logout": "Sign Out",

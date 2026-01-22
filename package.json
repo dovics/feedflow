@@ -1,5 +1,5 @@
 {
-  "name": "feedflow",
+  "name": "feedwise",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,9 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "docker-build": "docker build --build-arg DATABASE_URL=postgresql://feedflow:feedflow@localhost:5432/feedflow?schema=public -t dovics1/feedflow:$(git describe --tags --dirty --match='v*') .",
-    "docker-build-external": "docker build --build-arg DATABASE_URL=${DATABASE_URL:-postgresql://user:password@host:5432/feedflow?schema=public} -t dovics1/feedflow:$(git describe --tags --dirty --match='v*') .",
-    "docker-push": "docker push dovics1/feedflow:$(git describe --tags --dirty --match='v*')",
+    "docker-build": "docker build --build-arg DATABASE_URL=postgresql://feedwise:feedwise@localhost:5432/feedwise?schema=public -t dovics1/feedwise:$(git describe --tags --dirty --match='v*') .",
+    "docker-build-external": "docker build --build-arg DATABASE_URL=${DATABASE_URL:-postgresql://user:password@host:5432/feedwise?schema=public} -t dovics1/feedwise:$(git describe --tags --dirty --match='v*') .",
+    "docker-push": "docker push dovics1/feedwise:$(git describe --tags --dirty --match='v*')",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f"

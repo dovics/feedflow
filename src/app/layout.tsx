@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 import { locales, defaultLocale } from '@/i18n/navigation';
 
 export const metadata = {
-  title: "FeedFlow - RSS Reader",
+  title: "FeedWise - RSS Reader",
   description: "Simple RSS reader application",
 };
 

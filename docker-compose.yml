@@ -3,14 +3,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: feedflow-app
+    container_name: feedwise-app
     ports:
       - "3000:3000"
       - "5432:5432"
     environment:
       # Database configuration
       # If DATABASE_URL is not set, embedded PostgreSQL will be started automatically
-      # DATABASE_URL: postgresql://feedflow:feedflow@localhost:5432/feedflow?schema=public
+      # DATABASE_URL: postgresql://feedwise:feedwise@localhost:5432/feedwise?schema=public
       # Application configuration
       DEFAULT_ADMIN_PASSWORD: your-secret-key-change-this-in-production
       NODE_ENV: production
@@ -27,7 +27,7 @@ services:
 #
 #  app:
 #    environment:
-#      DATABASE_URL: postgresql://user:password@external-postgres-host:5432/feedflow?schema=public
+#      DATABASE_URL: postgresql://user:password@external-postgres-host:5432/feedwise?schema=public
 #      # When DATABASE_URL is set, embedded PostgreSQL will not be started
 
 volumes:

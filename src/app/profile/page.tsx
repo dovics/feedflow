@@ -123,7 +123,7 @@ export default function ProfilePage() {
             href="/"
             className="text-2xl font-bold text-theme-primary hover:text-theme-secondary"
           >
-            FeedFlow
+            FeedWise
           </a>
           <div className="flex items-center gap-4">
             <a

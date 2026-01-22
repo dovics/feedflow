@@ -12,7 +12,7 @@ CREATE TABLE "user" (
     "summary_language" TEXT NOT NULL DEFAULT 'zh',
     "item_retention_days" INTEGER NOT NULL DEFAULT -1,
     "item_retention_only_read" BOOLEAN NOT NULL DEFAULT true,
-    "last_item_cleanup" TIMESTAMP(3);
+    "last_item_cleanup" TIMESTAMP(3),
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -60,15 +60,6 @@ CREATE TABLE "systemconfig" (
     CONSTRAINT "systemconfig_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "feed_user_id_url_key" ON "feed"("user_id", "url");
-
--- CreateIndex
-CREATE UNIQUE INDEX "systemconfig_key_key" ON "systemconfig"("key");
-
 -- CreateTable
 CREATE TABLE "daily_summary" (
     "id" TEXT NOT NULL,
@@ -77,11 +68,21 @@ CREATE TABLE "daily_summary" (
     "content" TEXT NOT NULL,
     "language" TEXT NOT NULL DEFAULT 'zh',
     "item_count" INTEGER NOT NULL,
+    "article_map" JSONB,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "daily_summary_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "feed_user_id_url_key" ON "feed"("user_id", "url");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "systemconfig_key_key" ON "systemconfig"("key");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "daily_summary_user_id_date_key" ON "daily_summary"("user_id", "date");

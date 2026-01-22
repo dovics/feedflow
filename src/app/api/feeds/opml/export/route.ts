@@ -63,7 +63,7 @@ function generateOPML(feeds: Array<{ url: string; title: string; tags: string[] 
   let opml = `<?xml version="1.0" encoding="UTF-8"?>
 <opml version="2.0">
   <head>
-    <title>FeedFlow Subscriptions</title>
+    <title>FeedWise Subscriptions</title>
     <dateCreated>${currentDate}</dateCreated>
     <dateModified>${currentDate}</dateModified>
   </head>

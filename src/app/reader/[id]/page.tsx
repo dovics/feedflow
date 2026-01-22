@@ -43,14 +43,14 @@ export default function ReaderPage({ params }: { params: Promise<{ id: string }>
     const fetchItem = async () => {
       try {
         // 首先尝试从 sessionStorage 获取（从首页传入的数据）
-        const cachedItem = sessionStorage.getItem(`feedflow_item_${id}`);
+        const cachedItem = sessionStorage.getItem(`feedwise_item_${id}`);
 
         if (cachedItem) {
           const parsedItem = JSON.parse(cachedItem);
           setItem(parsedItem);
           setLoading(false);
           // 清除缓存，避免旧数据残留
-          sessionStorage.removeItem(`feedflow_item_${id}`);
+          sessionStorage.removeItem(`feedwise_item_${id}`);
           return;
         }
 

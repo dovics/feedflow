@@ -142,7 +142,7 @@ export function HomePage() {
   const handleItemClick = useCallback((itemId: string) => {
     // Clean up old item cache (keep last 10)
     const itemKeys = Object.keys(sessionStorage)
-      .filter(key => key.startsWith('feedflow_item_'))
+      .filter(key => key.startsWith('feedwise_item_'))
       .sort();
 
     if (itemKeys.length > 10) {
@@ -159,12 +159,12 @@ export function HomePage() {
       scrollPosition: window.scrollY,
       items: items,
     };
-    sessionStorage.setItem('feedflow_home_state', JSON.stringify(stateToSave));
+    sessionStorage.setItem('feedwise_home_state', JSON.stringify(stateToSave));
 
     // Cache item data for reader page
     const item = items.find(i => i.id === itemId);
     if (item) {
-      sessionStorage.setItem(`feedflow_item_${itemId}`, JSON.stringify(item));
+      sessionStorage.setItem(`feedwise_item_${itemId}`, JSON.stringify(item));
     }
   }, [selectedFeedId, selectedTag, readStatusFilter, items]);
 
@@ -252,7 +252,7 @@ export function HomePage() {
       // Clean up expired item cache (older than 1 hour)
       const oneHourAgo = Date.now() - 60 * 60 * 1000;
       Object.keys(sessionStorage)
-        .filter(key => key.startsWith('feedflow_item_'))
+        .filter(key => key.startsWith('feedwise_item_'))
         .forEach(key => {
           try {
             const item = JSON.parse(sessionStorage.getItem(key) || '');
@@ -282,7 +282,7 @@ export function HomePage() {
         });
 
       // Restore saved state if available
-      const savedState = sessionStorage.getItem('feedflow_home_state');
+      const savedState = sessionStorage.getItem('feedwise_home_state');
       if (savedState) {
         try {
           const saved = JSON.parse(savedState);

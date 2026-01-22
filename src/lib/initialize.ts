@@ -1,7 +1,7 @@
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
 
-const DEFAULT_ADMIN_EMAIL = "admin@feedflow.local";
+const DEFAULT_ADMIN_EMAIL = "admin@feedwise.local";
 const globalForInit = globalThis as unknown as {
   isInitializing: boolean;
   initializationPromise: Promise<void> | undefined;

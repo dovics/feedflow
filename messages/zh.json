@@ -12,7 +12,7 @@
     "submit": "提交"
   },
   "nav": {
-    "title": "FeedFlow",
+    "title": "FeedWise",
     "home": "首页",
     "settings": "个人设置",
     "profile": "个人设置",
@@ -177,7 +177,7 @@
     "logout": "退出登录"
   },
   "admin": {
-    "title": "FeedFlow",
+    "title": "FeedWise",
     "subtitle": "管理员面板",
     "backToHome": "返回首页",
     "logout": "退出",

@@ -1,4 +1,4 @@
-# FeedFlow - RSS Reader
+# FeedWise - RSS Reader
 
 A modern RSS reader built with Next.js and PostgreSQL for storing user data and RSS subscriptions.
 
@@ -44,7 +44,7 @@ The first registered user automatically becomes an ADMIN. Only SUPER_ADMIN users
 ### Authentication
 - Email/password-based registration and login
 - Secure session management with NextAuth.js
-- Default admin account (`admin@feedflow.local`) created on first startup
+- Default admin account (`admin@feedwise.local`) created on first startup
 
 ### Feed Management
 - Add RSS feeds by URL
@@ -126,7 +126,7 @@ Access the admin panel at `/admin` to configure:
 
 ## Documentation
 
-- **[User Guide](./USER_GUIDE.md)** - How to use FeedFlow
+- **[User Guide](./USER_GUIDE.md)** - How to use FeedWise
 - **[Admin Guide](./ADMIN_GUIDE.md)** - Admin features and configuration
 - **[Theme Documentation](./THEME.md)** - Theme system details
 - **[Prisma Troubleshooting](./PRISMA_TROUBLESHOOTING.md)** - Common issues and solutions

@@ -7,7 +7,7 @@ if [ -z "$DATABASE_URL" ]; then
   echo "DATABASE_URL not set. Starting embedded PostgreSQL..."
 
   # Auto-generate DATABASE_URL for embedded PostgreSQL
-  export DATABASE_URL="postgresql://feedflow:feedflow@localhost:5432/feedflow?schema=public"
+  export DATABASE_URL="postgresql://feedwise:feedwise@localhost:5432/feedwise?schema=public"
   echo "Auto-generated DATABASE_URL: ${DATABASE_URL}"
 
   # Create necessary directories for PostgreSQL
@@ -28,9 +28,9 @@ if [ -z "$DATABASE_URL" ]; then
 
     # Create database and user
     su-exec postgres psql -v ON_ERROR_STOP=1 <<-EOSQL
-      CREATE USER feedflow WITH PASSWORD 'feedflow';
-      CREATE DATABASE feedflow OWNER feedflow;
-      GRANT ALL PRIVILEGES ON DATABASE feedflow TO feedflow;
+      CREATE USER feedwise WITH PASSWORD 'feedwise';
+      CREATE DATABASE feedwise OWNER feedwise;
+      GRANT ALL PRIVILEGES ON DATABASE feedwise TO feedwise;
 EOSQL
 
     su-exec postgres pg_ctl -D /var/lib/postgresql/data -w stop
