@@ -101,7 +101,8 @@ export async function POST(
             link: item.link,
             description: item.contentSnippet || item.content || item.description,
             pubDate: item.pubDate ? new Date(item.pubDate) : new Date(),
-            feedId: id
+            feedId: id,
+            read: feed.defaultReadStatus
           }
         });
         newItemsCount++;

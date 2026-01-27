@@ -45,7 +45,8 @@ export async function POST(req: NextRequest) {
                 link: item.link,
                 description: item.contentSnippet || item.content || item.description,
                 pubDate: item.pubDate ? new Date(item.pubDate) : new Date(),
-                feedId: feed.id
+                feedId: feed.id,
+                read: feed.defaultReadStatus
               }
             });
           }
