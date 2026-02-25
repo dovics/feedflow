@@ -71,6 +71,8 @@ export async function POST(
     let newItemsCount = 0;
     let filteredItemsCount = 0;
 
+    logger.info('Feed default read status', { userId, feedId: id, defaultReadStatus: feed.defaultReadStatus });
+
     for (const item of parsedFeed.items) {
       const existingItem = await prisma.item.findFirst({
         where: {
@@ -105,6 +107,7 @@ export async function POST(
             read: feed.defaultReadStatus
           }
         });
+        logger.debug('Created new item with read status', { userId, feedId: id, itemTitle: item.title, readStatus: feed.defaultReadStatus });
         newItemsCount++;
       }
     }

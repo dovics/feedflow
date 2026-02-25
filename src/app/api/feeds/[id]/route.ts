@@ -54,6 +54,19 @@ export async function PATCH(
       data: updateData
     });
 
+    // 当修改 defaultReadStatus 时，同时更新所有现有的 items
+    if (defaultReadStatus !== undefined) {
+      await prisma.item.updateMany({
+        where: {
+          feedId: feedId,
+          read: !defaultReadStatus // 只更新状态不同的 items
+        },
+        data: {
+          read: defaultReadStatus
+        }
+      });
+    }
+
     return NextResponse.json({ feed: updatedFeed });
   } catch (error) {
     console.error("Feed update error:", error);

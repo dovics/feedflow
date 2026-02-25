@@ -17,7 +17,8 @@ const parser = new Parser({
 
 const feedSchema = z.object({
   url: z.string().url(),
-  titleFilter: z.string().optional()
+  titleFilter: z.string().optional(),
+  defaultReadStatus: z.boolean().optional()
 });
 
 export async function POST(req: NextRequest) {
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
     logger.logApiRequestStart('POST', '/api/feeds', userId);
 
     const body = await req.json();
-    const { url, titleFilter } = feedSchema.parse(body);
+    const { url, titleFilter, defaultReadStatus } = feedSchema.parse(body);
 
     logger.info('Feed subscription request received', { userId, url, hasTitleFilter: !!titleFilter });
 
@@ -99,7 +100,8 @@ export async function POST(req: NextRequest) {
       title: item.title || "Untitled",
       link: item.link,
       description: item.contentSnippet || item.content || item.description,
-      pubDate: item.pubDate ? new Date(item.pubDate) : new Date()
+      pubDate: item.pubDate ? new Date(item.pubDate) : new Date(),
+      read: defaultReadStatus ?? false
     }));
 
     // 如果设置了标题过滤器，使用正则表达式过滤
@@ -123,6 +125,7 @@ export async function POST(req: NextRequest) {
         title: feed.title || url,
         tags: [],
         titleFilter: titleFilter || null,
+        defaultReadStatus: defaultReadStatus ?? false,
         userId: session.user.id,
         items: {
           create: filteredItems
