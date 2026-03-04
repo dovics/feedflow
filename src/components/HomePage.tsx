@@ -174,6 +174,11 @@ export function HomePage() {
     setStreamingContent('');
     setIsStreaming(true);
 
+    // Clear existing summary when regenerating
+    if (force) {
+      setSummary(null);
+    }
+
     try {
       const response = await fetch("/api/summaries/stream", {
         method: "POST"
@@ -183,6 +188,13 @@ export function HomePage() {
         throw new Error('Stream request failed');
       }
 
+      // Get metadata from headers
+      const articleMapHeader = response.headers.get('X-Article-Map');
+      const itemCountHeader = response.headers.get('X-Item-Count');
+      const articleMap = articleMapHeader ? JSON.parse(articleMapHeader) : {};
+      const itemCount = itemCountHeader ? parseInt(itemCountHeader) : 0;
+
+      // Read the stream
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let fullContent = '';
@@ -195,46 +207,25 @@ export function HomePage() {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            try {
-              const parsed = JSON.parse(data);
-
-              if (parsed.type === 'error') {
-                setSummaryError(parsed.data);
-                setIsStreaming(false);
-                setSummaryLoading(false);
-                return;
-              } else if (parsed.type === 'token') {
-                fullContent += parsed.data;
-                setStreamingContent(fullContent);
-              } else if (parsed.type === 'done') {
-                console.log("Stream done received - parsed:", parsed);
-                console.log("Stream done received - articleMap:", parsed.articleMap);
-                const saveRes = await fetch("/api/summaries/save", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ force, content: fullContent, itemCount: parsed.itemCount, articleMap: parsed.articleMap })
-                });
-                const saveData = await saveRes.json();
-                if (saveData.summary) {
-                  setSummary(saveData.summary);
-                }
-                setIsStreaming(false);
-                setStreamingContent('');
-                setSummaryLoading(false);
-                return;
-              }
-            } catch (e) {
-              // Skip invalid JSON
-            }
-          }
-        }
+        const chunk = decoder.decode(value, { stream: true });
+        fullContent += chunk;
+        setStreamingContent(fullContent);
       }
+
+      // Save to database after streaming is complete
+      const saveRes = await fetch("/api/summaries/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ force, content: fullContent, itemCount, articleMap })
+      });
+      const saveData = await saveRes.json();
+      if (saveData.summary) {
+        setSummary(saveData.summary);
+      }
+      setIsStreaming(false);
+      setStreamingContent('');
+      setSummaryLoading(false);
+
     } catch (error) {
       console.error("Failed to stream summary:", error);
       setSummaryError("网络错误，请稍后重试");

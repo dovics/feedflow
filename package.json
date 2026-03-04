@@ -15,8 +15,11 @@
     "docker:logs": "docker-compose logs -f"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.39",
+    "@ai-sdk/react": "^3.0.110",
     "@auth/prisma-adapter": "^2.11.1",
     "@prisma/client": "^6.19.1",
+    "ai": "^6.0.108",
     "bcryptjs": "^3.0.3",
     "dotenv": "^16.4.7",
     "fast-xml-parser": "^5.3.3",

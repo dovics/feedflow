@@ -5,9 +5,19 @@ import { locales, defaultLocale } from './src/i18n/navigation';
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Skip API routes and static files
+  // For API routes, add cache control headers
+  if (pathname.startsWith('/api')) {
+    const response = NextResponse.next();
+    // Disable caching for all API routes
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    response.headers.set('Surrogate-Control', 'no-store');
+    return response;
+  }
+
+  // Skip static files
   if (
-    pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
     pathname.includes('.')
   ) {
