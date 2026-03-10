@@ -9,9 +9,11 @@ import { DailySummary } from "@/components/DailySummary";
 import { Sidebar } from "@/components/Sidebar";
 import { FilterTabs } from "@/components/FilterTabs";
 import { ItemList } from "@/components/ItemList";
+import { SearchBox } from "@/components/SearchBox";
 import { Item } from "@/types/item";
 
 type ReadStatusFilter = "all" | "read" | "unread";
+type SearchScope = "all" | "title" | "description";
 
 interface DailySummaryData {
   id: string;
@@ -32,6 +34,8 @@ export function HomePage() {
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [readStatusFilter, setReadStatusFilter] = useState<ReadStatusFilter>("unread");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchScope, setSearchScope] = useState<SearchScope>("all");
   const [items, setItems] = useState<Item[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -52,6 +56,8 @@ export function HomePage() {
     feedId?: string | null,
     tag?: string | null,
     readStatus?: ReadStatusFilter,
+    query?: string,
+    scope?: SearchScope,
     pageNum: number = 1,
     append: boolean = false
   ) => {
@@ -62,6 +68,8 @@ export function HomePage() {
       if (readStatus && readStatus !== "all") {
         params.append("read", readStatus === "read" ? "true" : "false");
       }
+      if (query) params.append("q", query);
+      if (scope && scope !== "all") params.append("scope", scope);
       params.append("page", pageNum.toString());
       params.append("limit", "20");
 
@@ -102,16 +110,16 @@ export function HomePage() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [hasMore, loadingMore, selectedFeedId, selectedTag, readStatusFilter]);
+  }, [hasMore, loadingMore, selectedFeedId, selectedTag, readStatusFilter, searchQuery, searchScope]);
 
   const loadMoreItems = useCallback(async () => {
     if (loadingMore || !hasMore) return;
 
     setLoadingMore(true);
     const nextPage = page + 1;
-    await fetchItems(selectedFeedId, selectedTag, readStatusFilter, nextPage, true);
+    await fetchItems(selectedFeedId, selectedTag, readStatusFilter, searchQuery, searchScope, nextPage, true);
     setLoadingMore(false);
-  }, [loadingMore, hasMore, page, selectedFeedId, selectedTag, readStatusFilter, fetchItems]);
+  }, [loadingMore, hasMore, page, selectedFeedId, selectedTag, readStatusFilter, searchQuery, searchScope, fetchItems]);
 
   // Handle selection changes from Sidebar
   const handleFeedSelect = useCallback((feedId: string | null) => {
@@ -119,25 +127,33 @@ export function HomePage() {
     setSelectedTag(null);
     setItems([]);
     setPage(1);
-    fetchItems(feedId, null, readStatusFilter, 1, false);
+    fetchItems(feedId, null, readStatusFilter, searchQuery, searchScope, 1, false);
     setSidebarOpen(false);
-  }, [fetchItems, readStatusFilter]);
+  }, [fetchItems, readStatusFilter, searchQuery, searchScope]);
 
   const handleTagSelect = useCallback((tag: string | null) => {
     setSelectedFeedId(null);
     setSelectedTag(tag);
     setItems([]);
     setPage(1);
-    fetchItems(null, tag, readStatusFilter, 1, false);
+    fetchItems(null, tag, readStatusFilter, searchQuery, searchScope, 1, false);
     setSidebarOpen(false);
-  }, [fetchItems, readStatusFilter]);
+  }, [fetchItems, readStatusFilter, searchQuery, searchScope]);
 
   const handleReadStatusFilterChange = useCallback((filter: ReadStatusFilter) => {
     setReadStatusFilter(filter);
     setItems([]);
     setPage(1);
-    fetchItems(selectedFeedId, selectedTag, filter, 1, false);
-  }, [fetchItems, selectedFeedId, selectedTag]);
+    fetchItems(selectedFeedId, selectedTag, filter, searchQuery, searchScope, 1, false);
+  }, [fetchItems, selectedFeedId, selectedTag, searchQuery, searchScope]);
+
+  const handleSearch = useCallback((query: string, scope: SearchScope) => {
+    setSearchQuery(query);
+    setSearchScope(scope);
+    setItems([]);
+    setPage(1);
+    fetchItems(selectedFeedId, selectedTag, readStatusFilter, query, scope, 1, false);
+  }, [fetchItems, selectedFeedId, selectedTag, readStatusFilter]);
 
   const handleItemClick = useCallback((itemId: string) => {
     // Clean up old item cache (keep last 10)
@@ -290,10 +306,10 @@ export function HomePage() {
           }, 100);
         } catch (error) {
           console.error('Failed to restore state:', error);
-          fetchItems(undefined, undefined, readStatusFilter, 1, false);
+          fetchItems(undefined, undefined, readStatusFilter, "", "all", 1, false);
         }
       } else {
-        fetchItems(undefined, undefined, readStatusFilter, 1, false);
+        fetchItems(undefined, undefined, readStatusFilter, "", "all", 1, false);
       }
     }
   }, [status, router, fetchItems]);
@@ -371,7 +387,7 @@ export function HomePage() {
               <Sidebar
                 onFeedSelect={handleFeedSelect}
                 onTagSelect={handleTagSelect}
-                onItemsNeedRefresh={() => fetchItems(selectedFeedId, selectedTag, readStatusFilter, 1, false)}
+                onItemsNeedRefresh={() => fetchItems(selectedFeedId, selectedTag, readStatusFilter, searchQuery, searchScope, 1, false)}
               />
             </div>
           </div>
@@ -452,6 +468,12 @@ export function HomePage() {
                       {markingAllRead ? "标记中…" : "全部已读"}
                     </button>
                   )}
+                </div>
+                <div className="mb-3">
+                  <SearchBox
+                    onSearch={handleSearch}
+                    placeholder={tHome('search.placeholder') || "搜索标题和摘要..."}
+                  />
                 </div>
                 <FilterTabs
                   currentFilter={readStatusFilter}

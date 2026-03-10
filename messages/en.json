@@ -86,6 +86,14 @@
       "all": "All",
       "read": "Read",
       "unread": "Unread"
+    },
+    "search": {
+      "placeholder": "Search...",
+      "scope": {
+        "all": "All",
+        "title": "Title",
+        "description": "Description"
+      }
     }
   },
   "settings": {

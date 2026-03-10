@@ -22,10 +22,12 @@ export async function GET(req: NextRequest) {
     const feedId = searchParams.get("feedId");
     const tag = searchParams.get("tag");
     const readStatus = searchParams.get("read");
+    const searchQuery = searchParams.get("q");
+    const searchScope = searchParams.get("scope") as "all" | "title" | "description" | null;
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
 
-    logger.logApiRequestStart('GET', '/api/items', userId, { feedId, tag, readStatus, page, limit });
+    logger.logApiRequestStart('GET', '/api/items', userId, { feedId, tag, readStatus, searchQuery, searchScope, page, limit });
 
     const skip = (page - 1) * limit;
 
@@ -65,6 +67,20 @@ export async function GET(req: NextRequest) {
         feedId: { in: feedIds },
         ...(readStatus !== null && {
           read: readStatus === "true"
+        }),
+        ...(searchQuery && {
+          ...(searchScope === "title" && {
+            title: { contains: searchQuery, mode: "insensitive" }
+          }),
+          ...(searchScope === "description" && {
+            description: { contains: searchQuery, mode: "insensitive" }
+          }),
+          ...((!searchScope || searchScope === "all") && {
+            OR: [
+              { title: { contains: searchQuery, mode: "insensitive" } },
+              { description: { contains: searchQuery, mode: "insensitive" } }
+            ]
+          })
         })
       },
       include: {

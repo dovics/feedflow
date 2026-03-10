@@ -86,6 +86,14 @@
       "all": "全部",
       "read": "已读",
       "unread": "未读"
+    },
+    "search": {
+      "placeholder": "搜索...",
+      "scope": {
+        "all": "全部",
+        "title": "标题",
+        "description": "摘要"
+      }
     }
   },
   "settings": {
