@@ -350,6 +350,7 @@ export function HomePage() {
               className="lg:hidden p-2 rounded-md hover:bg-theme-surface/50 text-theme-primary transition-colors focus-ring"
               aria-label={sidebarOpen ? "关闭侧边栏" : "打开侧边栏"}
               aria-expanded={sidebarOpen}
+              aria-controls="sidebar"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -368,6 +369,11 @@ export function HomePage() {
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setSidebarOpen(false);
+            }
+          }}
           aria-hidden="true"
         />
       )}
@@ -376,6 +382,7 @@ export function HomePage() {
       <div className="flex flex-1 relative">
         {/* Sidebar */}
         <aside
+          id="sidebar"
           className={`fixed lg:fixed inset-y-0 left-0 z-40 w-80 max-w-[85vw] transform transition-transform duration-300 ease-in-out ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
           }`}
@@ -397,7 +404,6 @@ export function HomePage() {
         <main
           id="main-content"
           className="flex-1 lg:ml-80 min-w-0"
-          tabIndex={-1}
         >
           <div className="max-w-5xl mx-auto px-6 py-8">
             <DailySummary

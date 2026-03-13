@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { AddFeedForm } from "@/components/AddFeedForm";
 import { TagFilter } from "@/components/TagFilter";
 import { FeedList } from "@/components/FeedList";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Feed } from "@/types/feed";
 
 type ReadStatusFilter = "all" | "read" | "unread";
@@ -35,6 +36,7 @@ export function Sidebar({
   const [refreshingAll, setRefreshingAll] = useState(false);
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ feedId: string; feedTitle: string } | null>(null);
 
   // Use ref to track autoRefreshed without causing re-renders
   const autoRefreshedRef = useRef(false);
@@ -175,15 +177,19 @@ export function Sidebar({
     }
   }, [fetchFeeds, onItemsNeedRefresh, tHome]);
 
-  // Delete feed handler
+  // Delete feed handler - opens confirmation dialog
   const handleDeleteFeed = useCallback(async (feedId: string) => {
-    if (!confirm(tHome('feeds.deleteConfirm') || "确定要取消订阅这个 RSS 源吗？")) {
-      return;
-    }
+    const feedToDelete = feeds.find(f => f.id === feedId);
+    setDeleteConfirm({ feedId, feedTitle: feedToDelete?.title || 'this feed' });
+  }, [feeds]);
+
+  // Confirm delete handler - executes the actual deletion
+  const handleConfirmDelete = useCallback(async () => {
+    if (!deleteConfirm) return;
 
     try {
-      setDeletingFeed(feedId);
-      const res = await fetch(`/api/feeds/${feedId}`, {
+      setDeletingFeed(deleteConfirm.feedId);
+      const res = await fetch(`/api/feeds/${deleteConfirm.feedId}`, {
         method: "DELETE"
       });
 
@@ -193,7 +199,7 @@ export function Sidebar({
         return;
       }
 
-      if (selectedFeedId === feedId) {
+      if (selectedFeedId === deleteConfirm.feedId) {
         setSelectedFeedId(null);
         onFeedSelect(null);
       }
@@ -204,8 +210,9 @@ export function Sidebar({
       setError(tHome('errors.network'));
     } finally {
       setDeletingFeed(null);
+      setDeleteConfirm(null);
     }
-  }, [selectedFeedId, fetchFeeds, onFeedSelect, tHome]);
+  }, [deleteConfirm, selectedFeedId, fetchFeeds, onFeedSelect, tHome]);
 
   // Refresh all feeds handler
   const handleRefreshAllFeeds = useCallback(async () => {
@@ -333,6 +340,17 @@ export function Sidebar({
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteConfirm !== null}
+        title="取消订阅确认"
+        message={`确定要取消订阅 "${deleteConfirm?.feedTitle}" 吗？此操作无法撤销。`}
+        confirmLabel="取消订阅"
+        cancelLabel="取消"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteConfirm(null)}
+        isDangerous={true}
+      />
     </div>
   );
 }

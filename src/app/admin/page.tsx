@@ -186,7 +186,11 @@ export default function AdminPanel() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        role="status"
+        aria-live="polite"
+      >
         <div className="text-theme-secondary">Loading...</div>
       </div>
     );
@@ -355,8 +359,11 @@ export default function AdminPanel() {
 
             {session?.user?.role === "SUPER_ADMIN" && (
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-purple-900 mb-3">
-                  👥 用户管理
+                <h3 className="text-lg font-semibold text-purple-900 mb-3 flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                  </svg>
+                  用户管理
                 </h3>
                 <p className="text-sm text-theme-secondary mb-4">
                   管理平台用户及权限
@@ -382,18 +389,30 @@ export default function AdminPanel() {
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className={`px-2 py-1 text-xs font-medium rounded ${
+                          <div className={`flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded ${
                             user.role === "SUPER_ADMIN"
                               ? "bg-purple-600 text-white"
                               : user.role === "ADMIN"
                               ? "bg-green-600 text-white"
                               : "bg-gray-600 text-white"
                           }`}>
-                            {user.role === "SUPER_ADMIN" && "👑 "}
-                            {user.role === "ADMIN" && "👤 "}
-                            {user.role === "USER" && "👥 "}
-                            {user.role}
-                          </span>
+                            {user.role === "SUPER_ADMIN" && (
+                              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            )}
+                            {user.role === "ADMIN" && (
+                              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                            {user.role === "USER" && (
+                              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                              </svg>
+                            )}
+                            <span>{user.role}</span>
+                          </div>
                           <span className="text-xs text-theme-muted">
                             {user._count.feeds} 个订阅
                           </span>
